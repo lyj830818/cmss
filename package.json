@@ -1,0 +1,22 @@
+{
+  "name": "cmss",
+  "version": "0.0.1",
+  "description": "",
+  "main": "wp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+  },
+  "dependencies": {
+    "request": "~2.30.0",
+    "redis": "~0.10.0",
+    "iconv-lite": "~0.2.11",
+    "cheerio": "~0.13.1",
+    "jQuery": "~1.7.4",
+    "underscore": "~1.5.2",
+    "bagpipe": "~0.3.5"
+  }
+}

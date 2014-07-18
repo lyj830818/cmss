@@ -1,0 +1,44 @@
+{
+	"aliyun": {
+		"log_level": 0,
+		"redis": {
+			"host": "42.96.172.233",
+			"port": "58302"
+		},
+		"pdf": "./result/asset/",
+		"static": {
+			"/js": "/asset/js/",
+			"/css": "/asset/css/",
+			"/img": "/asset/img/"
+		}
+	},
+	"development": {
+		"log_level": 1
+	},
+	"mania": {
+		"log_level": 0,
+		"redis": {
+			"host": "192.241.117.226",
+			"port": "39823"
+		},
+		"pdf": "./result/asset/",
+		"static": {
+			"/js": "/asset/js/",
+			"/css": "/asset/css/",
+			"/img": "/asset/img/"
+		}
+	},
+	"vbox": {
+		"log_level": 0,
+		"redis": {
+			"host": "192.168.100.98",
+			"port": "6379"
+		},
+		"static": {
+			"/js": "/asset/js/",
+			"/css": "/asset/css/",
+			"/img": "/asset/img/"
+		}
+	}
+
+}
