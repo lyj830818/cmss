@@ -28,7 +28,7 @@ bagpipe.on('full', function (length) {
 });
 
 var addTask = function (){
-	var txt = fs.readFileSync('domains_block.txtaf', 'utf-8');
+	var txt = fs.readFileSync('wp-domain.txt', 'utf-8');
 	var domains = txt.split("\n");
 	for(var i in domains){
 		domain = domains[i].trim();
