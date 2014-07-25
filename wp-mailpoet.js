@@ -59,7 +59,9 @@ crawler.oneurl = function (task, cb) {
 		}
 		if (response.statusCode === 200) {
       body = iconvLite.decode(body, 'utf8');
-			if(/wysija/.test(body)){
+
+      console.log("body length:" + body.length);
+			if(/wysija/.test(body) && body.length < 10000){
 				eventEmitter.emit('event-new-domain', task.url);
 				return;
 			}
@@ -80,7 +82,7 @@ crawler.start = function () {
 
 var bagpipe = new RedisBagpipe(redisClient, 'cms_scan_queue_key',
 	crawler.oneurl, function () {
-	}, 300);
+	}, 1);
 
 
 bagpipe.on('full', function (length) {
