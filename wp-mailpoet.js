@@ -46,7 +46,8 @@ crawler.oneurl = function (task, cb) {
 	//console.log(task.timeout);
 
 	task.timeout = 60000;
-	task.url = task.url + '/wp-content/plugins/wysija-newsletters/css/admin.css';
+  var domain = task.url;
+	task.url = domain + '/wp-content/plugins/wysija-newsletters/css/admin.css';
 	R.get(task.url, {timeout: task.timeout}, function (err, response, body) {
 
 		console.log("end get number:" + number++ );
@@ -62,7 +63,24 @@ crawler.oneurl = function (task, cb) {
 
       console.log("body length:" + body.length);
 			if(/wysija/.test(body) && body.length < 10000){
-				eventEmitter.emit('event-new-domain', task.url);
+        task.url = domain + '/wp-content/plugins/wysija-newsletters/readme.txt';
+        R.get(task.url , {timeout: task.timeout}, function(err , response , body){
+          if(err){
+            eventEmitter.emit('event-new-domain', domain);
+            return;
+          }
+
+          body = iconvLite.decode(body, 'utf8');
+          if(/2\.6\.8/.test(body) || /2\.6\.9/.test(body)){
+            return;
+          }else{
+            eventEmitter.emit('event-new-domain', domain);
+
+          }
+
+
+        });
+
 				return;
 			}
 		}
@@ -82,7 +100,7 @@ crawler.start = function () {
 
 var bagpipe = new RedisBagpipe(redisClient, 'cms_scan_queue_key',
 	crawler.oneurl, function () {
-	}, 1);
+	}, 30);
 
 
 bagpipe.on('full', function (length) {
