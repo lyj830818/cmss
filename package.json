@@ -8,15 +8,18 @@
   },
   "author": "",
   "license": "BSD-2-Clause",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
-    "request": "~2.30.0",
-    "redis": "~0.10.0",
-    "iconv-lite": "~0.2.11",
+    "bagpipe": "~0.3.5",
+    "buffer-search": "^1.2.0",
     "cheerio": "~0.13.1",
+    "iconv-lite": "~0.2.11",
     "jQuery": "~1.7.4",
+    "log4js": "^0.6.16",
+    "parse-domain": "^0.1.2",
+    "redis": "~0.10.0",
+    "request": "~2.30.0",
     "underscore": "~1.5.2",
-    "bagpipe": "~0.3.5"
+    "underscore.string": "^2.3.3"
   }
 }

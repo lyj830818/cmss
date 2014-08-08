@@ -2,7 +2,7 @@
  tessssssss
  * Created by Administrator on 14-1-8.
  */
-var config = require('./config').vbox,
+var config = require('./config').jin,
 	redis = require('redis'),
 	req = require('./src/Req'),
 	_ = require('underscore'),
@@ -28,14 +28,15 @@ bagpipe.on('full', function (length) {
 });
 
 var addTask = function (){
-	var txt = fs.readFileSync('wp-domain.txt', 'utf-8');
+	var txt = fs.readFileSync('domains/xaa', 'utf-8');
 	var domains = txt.split("\n");
 	for(var i in domains){
 		domain = domains[i].trim();
 		if(domain == ''){
 			continue;
 		}
-		bagpipe.push({url: domain, retry: 1, timeout: 15000})
+		bagpipe.push({url: 'http://' +  domain, retry: 1, timeout: 30000})
+		bagpipe.push({url: 'http://' + 'www.' + domain, retry: 1, timeout: 30000})
 	}
 }
 

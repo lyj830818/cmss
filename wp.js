@@ -2,9 +2,10 @@
  tessssssss
  * Created by Administrator on 14-1-8.
  */
-var config = require('./config').vbox,
+var config = require('./config').jin,
 	redis = require('redis'),
-	req = require('./src/Req'),
+//	req = require('./src/Req'),
+	req = require('./src/netReq'),
 	_ = require('underscore'),
 	events = require('events'),
 	iconvLite = require('iconv-lite'),
@@ -17,11 +18,20 @@ var config = require('./config').vbox,
 
 var eventEmitter = new events.EventEmitter();
 
-var errorHandler = function (message) {
+var errorHandler = function (message, obj) {
+	//
+	if(message.indexOf('getHostByName ETIMEOUT') >= 0 || (obj && obj.err && obj.err.syscall == 'getHostByName')){
+		dnsErrorDmStream.write( obj.url + '\n');
+	}	
+	if(obj && obj.err == 'NetReq Timeout Emitted' ){
+		networkTimeoutDmStream.write( obj.url + '\n');
+	}
 	console.log(message);
 }
 
 var wpDomainStream = fs.createWriteStream('./wp-domain.txt', {flags: 'a', encoding: 'utf8'});
+var dnsErrorDmStream = fs.createWriteStream('./dns-error1.txt', {flags: 'a', encoding: 'utf8'});
+var networkTimeoutDmStream = fs.createWriteStream('./net-timeout-dm.txt', {flags: 'a', encoding: 'utf8'});
 
 
 var write2File = function (domain) {
@@ -53,7 +63,7 @@ crawler.oneurl = function (task, cb) {
 		cb();//网络请求结束，调用下一个task
 
 		if (err) {
-			eventEmitter.emit('event-error', 'error get ' + task.url + ' ' + err);
+			eventEmitter.emit('event-error', 'error get ' + task.url + ' ' + err,{ url:task.url, err : err});
 			return;
 		}
 		if (response.statusCode === 200) {
@@ -70,7 +80,7 @@ crawler.oneurl = function (task, cb) {
 			}else{
 				R.get( task.url + "/xmlrpc.php" , {timeout: task.timeout} , function(err, response, body){
 					if (err) {
-						eventEmitter.emit('event-error', 'error get '  + task.url + "/xmlrpc.php" + ' ' + err);
+						eventEmitter.emit('event-error', 'error get '  + task.url + "/xmlrpc.php" + ' ' + err,{ url:task.url, err : err});
 						return;
 					}
 					if(response.statusCode === 200){
@@ -82,7 +92,7 @@ crawler.oneurl = function (task, cb) {
 						}else{
 							R.get( task.url + "/wp-login.php" , {timeout: task.timeout} , function(err, response, body){
 								if (err) {
-									eventEmitter.emit('event-error', 'error get ' + task.url + "/wp-login.php" + ' ' + err);
+									eventEmitter.emit('event-error', 'error get ' + task.url + "/wp-login.php" + ' ' + err,{ url:task.url, err : err});
 									return;
 								}
 								if(response.statusCode === 200){
@@ -118,7 +128,7 @@ crawler.start = function () {
 
 var bagpipe = new RedisBagpipe(redisClient, 'cms_scan_queue_key',
 	crawler.oneurl, function () {
-	}, 300);
+	}, 50);
 
 
 bagpipe.on('full', function (length) {
@@ -129,10 +139,12 @@ bagpipe.on('full', function (length) {
 });
 
 //http://www.rainweb.cn/article/355.html
+
 process.on('uncaughtException', function(err){
 	console.log('Caught exception:' + err);
 
 });
+
 
 setTimeout(crawler.start, 3000);
 
