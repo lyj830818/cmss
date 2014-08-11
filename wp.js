@@ -51,7 +51,7 @@ var number = 0;
 var crawler = {};
 var R = new req.Req();
 var RETRY_TIMES = 2;
-crawler.oneurl = function (task, cb) {
+crawler.oneurl = function (task, cb,task_idx) {
 
 	//console.log(task.timeout);
 
@@ -60,7 +60,7 @@ crawler.oneurl = function (task, cb) {
 
 		console.log("end get number:" + number++ );
 		console.log('end get:' + task.url);
-		cb();//网络请求结束，调用下一个task
+		cb(task_idx);//网络请求结束，调用下一个task
 
 		if (err) {
 			eventEmitter.emit('event-error', 'error get ' + task.url + ' ' + err,{ url:task.url, err : err});
@@ -126,7 +126,7 @@ crawler.start = function () {
 	bagpipe.observer();
 }
 
-var bagpipe = new RedisBagpipe(redisClient, 'cms_scan_queue_key',
+var bagpipe = new RedisBagpipe('redis',redisClient, 'cms_scan_queue_key',
 	crawler.oneurl, function () {
 	}, 50);
 
@@ -145,6 +145,10 @@ process.on('uncaughtException', function(err){
 
 });
 
+process.on('restart', function(err){
+	process.exit();
+
+});
 
 setTimeout(crawler.start, 3000);
 

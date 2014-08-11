@@ -14,7 +14,7 @@ var config = require('./config').jin,
 var redisClient = redis.createClient(config.redis.port, config.redis.host);
 
 
-var bagpipe = new RedisBagpipe(redisClient, 'cms_scan_queue_key',
+var bagpipe = new RedisBagpipe('redis', redisClient, 'mailpoet_queue',
 	function(){}, function () {
 	}, 50);
 bagpipe.getLen();
@@ -28,15 +28,17 @@ bagpipe.on('full', function (length) {
 });
 
 var addTask = function (){
-	var txt = fs.readFileSync('domains/xaa', 'utf-8');
+	var txt = fs.readFileSync('uniq-domains.txt', 'utf-8');
+	//var txt = fs.readFileSync('mailpoet-example.txt', 'utf-8');
 	var domains = txt.split("\n");
 	for(var i in domains){
 		domain = domains[i].trim();
 		if(domain == ''){
 			continue;
 		}
-		bagpipe.push({url: 'http://' +  domain, retry: 1, timeout: 30000})
-		bagpipe.push({url: 'http://' + 'www.' + domain, retry: 1, timeout: 30000})
+		//bagpipe.push({url: 'http://' +  domain, retry: 1, timeout: 30000})
+		bagpipe.push({url:  domain, retry: 1, timeout: 30000})
+	//	bagpipe.push({url: 'http://' + 'www.' + domain, retry: 1, timeout: 30000})
 	}
 }
 

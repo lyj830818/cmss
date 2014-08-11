@@ -2,9 +2,10 @@
  tessssssss
  * Created by Administrator on 14-1-8.
  */
-var config = require('./config').vbox,
+var config = require('./config').jin,
 	redis = require('redis'),
-	req = require('./src/Req'),
+	//req = require('./src/Req'),
+	req = require('./src/netReq'),
 	_ = require('underscore'),
 	events = require('events'),
 	iconvLite = require('iconv-lite'),
@@ -41,7 +42,7 @@ var number = 0;
 var crawler = {};
 var R = new req.Req();
 var RETRY_TIMES = 2;
-crawler.oneurl = function (task, cb) {
+crawler.oneurl = function (task, cb, task_idx) {
 
 	//console.log(task.timeout);
 
@@ -52,7 +53,7 @@ crawler.oneurl = function (task, cb) {
 
 		console.log("end get number:" + number++ );
 		console.log('end get:' + task.url);
-		cb();//网络请求结束，调用下一个task
+		cb(task_idx);//网络请求结束，调用下一个task
 
 		if (err) {
 			eventEmitter.emit('event-error', 'error get ' + task.url + ' ' + err);
@@ -98,9 +99,9 @@ crawler.start = function () {
 	bagpipe.observer();
 }
 
-var bagpipe = new RedisBagpipe(redisClient, 'cms_scan_queue_key',
+var bagpipe = new RedisBagpipe('redis', redisClient, 'mailpoet_queue',
 	crawler.oneurl, function () {
-	}, 30);
+	}, 100);
 
 
 bagpipe.on('full', function (length) {
@@ -113,7 +114,12 @@ bagpipe.on('full', function (length) {
 //http://www.rainweb.cn/article/355.html
 process.on('uncaughtException', function(err){
 	console.log('Caught exception:' + err);
+  console.dir(err.stack);
 
+});
+
+bagpipe.on('restart', function (length, url) {
+    process.exit();
 });
 
 setTimeout(crawler.start, 3000);
